@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { HttpClientJsonpModule } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+
+import { Item } from '../Item';
 
 @Injectable({
   providedIn: 'root'
@@ -9,14 +11,25 @@ import { Observable } from 'rxjs';
 export class ItemService {
 
   private itemsUrl = 'http://localhost:8080/api/items';
-  CALLBACK = 'JSONP_CALLBACK';
+
 
   constructor(
     private httpClient: HttpClient,
-    private httpClientJsonpModule: HttpClientJsonpModule
+    private httpHeaders: HttpHeaders,
   ) { }
 
   getItems(): Observable<Item[]> {
-
+    return this.httpClient.get<Item[]>(this.itemsUrl)
+      .map((response)) => {
+        let content;
+        let obj = response.json();
+        content = {
+          error: null,
+          data: obj
+        };
+        console.dir(content);
+        return content;
+      }
   }
+
 }
